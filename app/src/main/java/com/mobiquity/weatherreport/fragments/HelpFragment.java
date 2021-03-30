@@ -30,7 +30,7 @@ public class HelpFragment extends Fragment {
 
     private Context mContext;
     private WebView webView;
-    private static final String helpUrl = "https://www.accuweather.com/en/in/hyderabad/202190/hourly-weather-forecast/202190";
+    private static final String helpUrl = "https://support.google.com/googlenest/answer/7072091?hl=en";
 
     public HelpFragment(Context mContext){
         this.mContext = mContext;

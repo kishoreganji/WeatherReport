@@ -43,7 +43,7 @@ public class WeatherDetailsFragment extends Fragment {
     private Context mContext;
     private CityDo cityDo;
     private WeatherDetailsDo weatherDetailsDo;
-    private TextView tvWeather, tvMain, tvFeelsLike, tvPressure, tvTempMin, tvTempMax, tvHumidity, tvWind, tvSpeed,
+    private TextView tvWeather, tvTemp, tvFeelsLike, tvPressure, tvTempMin, tvTempMax, tvHumidity, tvWind, tvSpeed,
             tvDeg, tvSys, tvType, tvId, tvCountry, tvSunrise, tvSunset, tvClose;
     private RecyclerView rvWeather;
     private CLoseFragmentListener cLoseFragmentListener;
@@ -75,6 +75,7 @@ public class WeatherDetailsFragment extends Fragment {
     private void bindData(WeatherDetailsDo weatherDetailsDo) {
         MainDo mainDo = weatherDetailsDo.getMain();
 
+        tvTemp.setText("Temp : "+mainDo.getTemp());
         tvFeelsLike.setText("Feels Like : "+mainDo.getFeels_like());
         tvTempMin.setText("Temp Min : "+mainDo.getTemp_min());
         tvTempMax.setText("Temp Max : "+mainDo.getTemp_max());
@@ -98,7 +99,7 @@ public class WeatherDetailsFragment extends Fragment {
 
     private void initialiseControls(View view) {
         tvWeather           = view.findViewById(R.id.tvWeather);
-        tvMain              = view.findViewById(R.id.tvMain);
+        tvTemp              = view.findViewById(R.id.tvTemp);
         tvFeelsLike         = view.findViewById(R.id.tvFeelsLike);
         tvPressure          = view.findViewById(R.id.tvPressure);
         tvTempMin           = view.findViewById(R.id.tvTempMin);

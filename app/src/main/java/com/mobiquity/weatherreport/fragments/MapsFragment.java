@@ -15,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -118,7 +119,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
 
     private void turnGPSOn(){
-        startActivityForResult( new Intent(Settings. ACTION_LOCATION_SOURCE_SETTINGS), 122); ;
+        final LocationManager manager = (LocationManager) getActivity().getSystemService( Context.LOCATION_SERVICE );
+
+        if (!manager.isProviderEnabled( LocationManager.GPS_PROVIDER )) {
+            startActivityForResult( new Intent(Settings. ACTION_LOCATION_SOURCE_SETTINGS), 122);
+        }
+
     }
 
     @Override
@@ -140,14 +146,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
     @Override
     public void onLocationChanged(Location location) {
-
-        String address = getAddress(location.getLatitude(), location.getLongitude());
-        Toast.makeText(getActivity(), address, Toast.LENGTH_SHORT).show();
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 12));
-
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(new LatLng(location.getLatitude(), location.getLongitude()));
-        markerOptions.title("i'm here");
     }
 
 
@@ -156,15 +155,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     public void onConnected(@Nullable Bundle bundle) {
         LocationRequest mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(LocationRequest.PRIORITY_LOW_POWER);
-        mLocationRequest.setInterval(115 * 60 * 1000);//
-
+        mLocationRequest.setInterval(100 * 60 * 1000);//
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (mLastLocation != null) {
-            String address = getAddress(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-            Toast.makeText(getActivity(), address, Toast.LENGTH_SHORT).show();
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(),
-                                                                mLastLocation.getLongitude()), 10));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude()), 12));
         }
     }
 
@@ -186,12 +181,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(latLng);
-//                markerOptions.title(getAddress(latLng.latitude,latLng.longitude));
-//                map.clear();
                 map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-//                map.addMarker(markerOptions);
             }
         });
         map.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
