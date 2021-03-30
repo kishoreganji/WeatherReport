@@ -27,7 +27,6 @@ import java.util.ArrayList;
 public class WeatherReportActivity extends AppCompatActivity implements CityClickListener {
 
     private FrameLayout flContainer;
-    private FloatingActionButton fabAddCity;
     private HomeFragment homeFragment;
     private HelpFragment helpFragment;
     private WeatherDetailsFragment weatherDetailsFragment;
@@ -39,15 +38,7 @@ public class WeatherReportActivity extends AppCompatActivity implements CityClic
         setContentView(R.layout.activity_main);
 
         flContainer   = findViewById(R.id.flContainer);
-        fabAddCity    = findViewById(R.id.fabAddCity);
         loadHomeFragment();
-        fabAddCity.setVisibility(View.GONE);
-        fabAddCity.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                loadMapsFragment();
-            }
-        });
 
     }
     @Override
@@ -82,14 +73,12 @@ public class WeatherReportActivity extends AppCompatActivity implements CityClic
         fragmentTransaction.commit();
     }
     private void loadDetailsFragment(CityDo cityDo) {
-        fabAddCity.setVisibility(View.GONE);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         weatherDetailsFragment = new WeatherDetailsFragment(this, cityDo, cLoseFragmentListener);
         fragmentTransaction.add(R.id.flContainer, weatherDetailsFragment, "WeatherDetails").addToBackStack("WeatherDetails");
         fragmentTransaction.commit();
     }
     private void loadMapsFragment() {
-        fabAddCity.setVisibility(View.GONE);
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         mapsFragment = new MapsFragment(this, cityAddListener);
         fragmentTransaction.add(R.id.flContainer, mapsFragment, "Map").addToBackStack("Map");
@@ -105,36 +94,31 @@ public class WeatherReportActivity extends AppCompatActivity implements CityClic
     private CityAddListener cityAddListener = new CityAddListener() {
         @Override
         public void addedCity(final CityDo cityDo) {
-            new DBTask(WeatherReportActivity.this, "insert", new DBUpdateListener() {
+            new DBTask(WeatherReportActivity.this, "get", new DBUpdateListener() {
                 @Override
                 public void getAllCities(ArrayList<CityDo> cityDos) {
                     if(cityDos!=null && cityDos.size() > 0){
                         for (int i=0;i<cityDos.size(); i++){
-                            if(!cityDos.get(i).getCityName().equalsIgnoreCase(cityDo.getCityName())){
-                                new DBTask(WeatherReportActivity.this, "insert", new DBUpdateListener() {
-                                    @Override
-                                    public void getAllCities(ArrayList<CityDo> cityDos) {
-
-                                    }
-
-                                    @Override
-                                    public void dbUpdate() {
-                                        loadHomeFragment();
-                                    }
-                                }).execute(cityDo);
-                            }
-                            else {
+                            if(cityDos.get(i).getCityName().equalsIgnoreCase(cityDo.getCityName())){
                                 Toast.makeText(WeatherReportActivity.this, "This city is already added!", Toast.LENGTH_SHORT).show();
+                                return;
                             }
                         }
                     }
+                    new DBTask(WeatherReportActivity.this, "insert", new DBUpdateListener() {
+                        @Override
+                        public void getAllCities(ArrayList<CityDo> cityDos) { }
+                        @Override
+                        public void dbUpdate() {
+                            loadHomeFragment();
+                        }
+                    }).execute(cityDo);
                 }
 
                 @Override
                 public void dbUpdate() {
-                    loadHomeFragment();
                 }
-            }).execute(cityDo);
+            }).execute();
         }
     };
 
